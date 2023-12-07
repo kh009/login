@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .font-size-large {
+        font-size: 18px;
+    }
+
+    /*.delete-button {
+        cursor: pointer;*/
+    }
+</style>
+<h2>學生缺勤記錄</h2>
+{% if position == 'teacher' %}
+    <form method="get" action="">
+        <label for="week_number">選擇週數：</label>
+        <select id="week_number" name="week_number">
+            <option value="">全部</option>
+            {% for week in all_weeks %}
+                <option value="{{ week }}" {% if week|default_if_none:"" == selected_week %}selected{% endif %}>{{ week }}周</option>
+            {% endfor %}
+        </select>
+        <button type="submit">顯示選擇周的紀錄</button>
+    </form>
+{% endif %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>學生姓名</th>
+            <th>課程名稱</th>
+            <th>出席狀態</th>
+            <th>選位時間</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for course_seat in course_seats %}
+            {% if course_seat.course.course_name == subject %}
+                <tr>
+                    <td>{{ course_seat.student }}</td>
+                    <td>{{ course_seat.course.course_name }}</td>
+                    <td>
+                        {% if course_seat.is_absent  %}
+                            <span class="badge bg-danger fs-5">缺席</span>
+                        {% else %}
+                            <span class="badge bg-success fs-5">出席</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        第{{ course_seat.week_number }}周{{ course_seat.selection_time|date:" n月 j日 G:i" }}
+                    </td>
+                    <td class="delete-button">
+                        {% if course_seat.is_absent %}
+                            <p>無法刪除此紀錄。</p>
+                        {% else %}
+                            {% if course_time_start|date:"U" < current_time|date:"U" and current_time|date:"U" < course_time_end|date:"U" and course_seat.selection_time.date == current_time.date or position == 'teacher'%}
+                                <form action="{% url 'record' subject=subject %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="course_seat_id" value="{{ course_seat.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">刪除</button>
+                                </form>
+                            {% else %}
+                                <p>無法刪除此紀錄。</p>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

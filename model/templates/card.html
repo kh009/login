@@ -1,0 +1,37 @@
+<!-- card_template.html -->
+<div class="card shadow w-100 h-100">
+    <img src="/static/images/course.jpg" class="card-img-top img-fluid" alt="Course Image">
+
+    <div class="card-body text-center bg-light">
+        <h4 class="card-header">
+            {% if position == "student" %}
+                {{ course.course_key.course_name }}
+            {% elif position == "teacher" %}
+                {{ course.course_name }}
+            {% endif %}
+        </h4>
+        <p class="card-text">
+            {% if position == "student" %}
+                教师：{{ course.course_key.teacher_key }}
+            {% elif position == "teacher" %}
+                教师：{{ course.teacher_key }}
+            {% endif %}
+        </p>
+        <p class="card-text">
+            上课时间：{% if position == "student" %}({{ course.course_key.get_day_of_week_display }}){% endif %}{{ course.course_key.class_time }}
+        </p>
+        <!-- 其他信息 -->
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{% url 'course' subject=course.course_key.course_name %}" class="card-link btn btn-primary">
+                    进入课程
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'record' subject=course.course_key.course_name %}" class="card-link btn btn-secondary">
+                    缺课记录
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

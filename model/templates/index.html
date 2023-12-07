@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+<style>
+    /* 添加自定义样式 */
+    .card-title {
+        font-size: 1.5rem; /* 调整标题字体大小 */
+        font-weight: bold; /* 加粗标题文字 */
+        margin-bottom: 0.5rem; /* 调整标题底部间距 */
+    }
+
+    .card-text {
+        font-size: 1rem; /* 调整正文字体大小 */
+        color: #555; /* 设置正文文字颜色 */
+        margin-bottom: 1rem; /* 调整正文底部间距 */
+    }
+
+    .btn {
+        width: 100%;
+        margin-top: auto; /* 使按钮距离卡片底部间距为 auto */
+    }
+</style>
+{% endblock head %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            {% if position == "student" %}
+                {% for course1 in course_selection %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{% static 'images/course.jpg' %}" class="card-img-top" alt="Course Image">
+                            <div class="card-body bg-light d-flex flex-column justify-content-between">
+                                <h5 class="card-title">{{ course1.course_key.course_name }}</h5>
+                                <p class="card-text">教師：{{ course1.course_key.teacher_key }}</p>
+                                <!-- 其他信息 -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a href="{% url 'course' subject=course1.course_key.course_name %}" class="btn btn-primary">
+                                            進入課程
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="{% url 'record' subject=course1.course_key.course_name %}" class="btn btn-secondary">
+                                            缺曠紀錄
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% elif position == "teacher" %}
+                {% for course1 in course %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{% static 'images/course.jpg' %}" class="card-img-top" alt="Course Image">
+                            <div class="card-body bg-light d-flex flex-column justify-content-between">
+                                <h5 class="card-title">{{ course1.course_name }}</h5>
+                                <p class="card-text">教師：{{ course1.teacher_key }}</p>
+                                <!-- 其他信息 -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a href="{% url 'course' subject=course1.course_name %}" class="btn btn-primary">
+                                            進入課程
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="{% url 'record' subject=course1.course_name %}" class="btn btn-secondary">
+                                            缺曠紀錄
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

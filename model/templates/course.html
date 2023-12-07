@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block head %}
+{% endblock head %}
+{% block content %}
+    <style>
+        .table-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: auto; /* Enable horizontal scrolling if needed */
+        }
+
+        .table {
+            width: 100%;
+            max-width: 100%;
+        }
+    </style>
+    {% if message == 'alert' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>已選位!</strong> 請刪除選位後，再進行選擇
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% elif message == 'tt' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>請選位!</strong> 請選則座位後，再按確定選位
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% elif message == '選位時間未到/已過' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>選位時間未到/已過!</strong> 請確認課表
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% elif message == '今天沒有這堂課' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>今天沒有這堂課!</strong> 請確認課表
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <div class="container border">
+        <div class="row">
+            <div class="col-md-12">
+                <p>課程名稱：{{subject}}</p>
+                <p>座位表：{{classroom}}</p>
+                <div class="clearfix">
+                    <div class="col-12">
+                        <form action="{% url 'course' subject=subject %}" class="mb-5" method="post">
+                            {% csrf_token %}   
+                            {% if position == 'teacher' %}
+                                <!-- 显示老师选择学生座位的表单 -->
+                                <label for="selected_student" class="form-label">選擇學生：</label>
+                                <select class="form-select" name="selected_student" id="selected_student">
+                                    {% for student in students %}
+                                        <option value="{{ student }}">{{ student }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                            <!-- 座位列表 -->
+                            <div class="row g-0">
+                                <div class="table-container mt-3 d-sm-block">
+                                    <!-- ... 03A0701 ... -->
+                                    {% if classroom == '03C0701' %}
+                                        <div class="table-container mt-3 d-sm-block">
+                                            <table class="table">
+                                                {% for key, value in seat.items %}
+                                                    {% if key != '0' %} {# 忽略 key 为 0 的座位 #}
+                                                        {% if forloop.counter0|divisibleby:10 and not forloop.first %}
+                                                            </tr><tr>
+                                                        {% endif %}
+                                                        <td>
+                                                            <div class="button-container">
+                                                                {% if value == 0 %}
+                                                                    <input value="{{ key }}" type="radio" class="btn-check"
+                                                                        name="number" id="success-outlined-{{ key }}"
+                                                                        autocomplete="off">
+                                                                    <label style="width: 77px;" class="btn btn-outline-success m-1"
+                                                                        for="success-outlined-{{ key }}">{{ key }}</label>
+                                                                {% elif value != 0 %}
+                                                                    <input value="{{ key }}" type="radio" class="btn-check"
+                                                                        name="number" id="success-outlined-{{ key }}"
+                                                                        autocomplete="off" disabled>
+                                                                    <label style="width: 77px;" class="btn btn-success m-1"
+                                                                        for="success-outlined-{{ key }}">{{ value }}</label>
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                        {% if forloop.counter in seats_per_column %}
+                                                            </tr><tr>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </table>
+                                        </div>
+                                    <!-- ... '03C0602' or '03C0603' ... -->
+                                    {% elif message == '03C0602' or '03C0603' %}
+                                        <table class="table">
+                                            <tr>
+                                                <td>
+                                                    <div class="button-container">
+                                                        {% for key, value in seat.items %}
+                                                            {% if key != '0' %} {# 忽略 key 为 0 的座位 #}
+                                                                {% if forloop.counter0|divisibleby:14 and not forloop.first %}
+                                                                    </div></td><td><div class="button-container">
+                                                                {% endif %}
+                                                                <div class="button">
+                                                                    {% if value == 0 %}
+                                                                        <input value="{{ key }}" type="radio" class="btn-check"
+                                                                            name="number" id="success-outlined-{{ key }}"
+                                                                            autocomplete="off">
+                                                                        <label style="width: 77px;" class="btn btn-outline-success m-1"
+                                                                            for="success-outlined-{{ key }}">{{ key }}</label>
+                                                                    {% elif value != 0 %}
+                                                                        <input value="{{ key }}" type="radio" class="btn-check"
+                                                                            name="number" id="success-outlined-{{ key }}"
+                                                                            autocomplete="off" disabled>
+                                                                        <label style="width: 77px;" class="btn btn-success m-1"
+                                                                            for="success-outlined-{{ key }}">{{ value }}</label>
+                                                                    {% endif %}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-3">
+                                    {% if message == 'None' or  position == 'teacher' %}
+                                        {% if message == '今天沒有這堂課' %}
+                                            <input class="form-control btn btn-lg btn-primary" type="submit" value="確定選位" disabled>
+                                        {% else %}
+                                            <input class="form-control btn btn-lg btn-primary" type="submit" value="確定選位">
+                                        {% endif %}
+                                    {% else %}
+                                        {% if message == 'alert' or message == 'tt' %}
+                                            <input class="form-control btn btn-lg btn-primary" type="submit" value="確定選位" >
+                                        {% else %}
+                                            <input class="form-control btn btn-lg btn-primary" type="submit" value="確定選位" disabled>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
