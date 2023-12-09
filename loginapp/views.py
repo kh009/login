@@ -18,10 +18,9 @@ from django.contrib.auth.hashers import make_password, check_password
 def header(request):
     username = request.session.get('username')
     username2 = Student.objects.get(studentID=username)
-    return render(request, "header.html", locals())
+    return render(request, "base.html", locals())
 
 # 登入
-
 
 def login(request):
     if request.method == 'POST':
@@ -156,7 +155,7 @@ def course(request, subject):
         course = Course.objects.get(course_name=subject)
         courses = Course.objects.filter(course_name=subject)
         students = Course_Selection.objects.filter(
-            course_key=course).values_list('studentID', flat=True)
+            course_key=course).values_list('studentID__studentID', 'studentID__name')
         print('學生:', students)
         classroom = course.classroom.classroom_key
         print('classroom:', classroom, type(classroom))
