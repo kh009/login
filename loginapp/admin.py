@@ -1,6 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from .models import *
+from .resources import StudentResource
 # Register your models here.
 
 admin.site.site_header = '點名系統管理後台'  # 设置header
@@ -10,6 +11,7 @@ admin.site.index_title = '點名系統管理後台'
 @admin.register(Student)
 class StudentAdmin(ImportExportModelAdmin):
     list_display = ('className', 'studentID', 'name', 'email')
+    resource_class = StudentResource
 
 @admin.register(Classroom)
 class ClassroomAdmin(ImportExportModelAdmin):

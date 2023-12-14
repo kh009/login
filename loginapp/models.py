@@ -16,7 +16,11 @@ class Student(models.Model):
 
     def save(self, *args, **kwargs):
         # 在保存之前使用 make_password 将密码哈希化
-        self.password = make_password(self.password)
+        if not self.password:
+            # 只有当密码为空时，才使用 studentID 作为默认密码
+            self.password = make_password(self.studentID)
+        else:
+            self.password = make_password(self.password)
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -1,20 +1,14 @@
 {% extends 'base.html' %}
 {% block head %}
     <style>
-        .table-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: auto; /* Enable horizontal scrolling if needed */
-        }
-
-        .table {
-            max-width: 100%;
-            overflow: auto;
+        .table-responsive {
+            width: 100%;
+            margin-bottom: 0;
         }
         .container {
             height: 100%;
             width: 100%;
+
         }
     </style>
 {% endblock head %}
@@ -63,7 +57,7 @@
                         <!-- 座位列表 -->
                         <div class="container">
                             <div class="col-12">
-                                <div class="table mt-3">
+                                <div class="table-responsive mt-3">
                                     <!-- ... 03A0701 ... -->
                                     {% if classroom == '03C0701' %}
                                         <div>
