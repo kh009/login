@@ -37,7 +37,7 @@
     <div class="container border">
         <div class="col-sm-12">
           <div class="container mt-4">
-            <!-- 使用 Bootstrap 样式类 -->
+            <!-- 使用 Bootstrap 樣式類 -->
             <p class="fs-5">課程名稱：{{subject}}</p>
             <p class="fs-5 text-muted">座位表 ：{{classroom}}</p>
         </div>
@@ -46,7 +46,7 @@
                     <form action="{% url 'course' subject=subject %}" class="mb-5" method="post">
                         {% csrf_token %}   
                         {% if position == 'teacher' %}
-                            <!-- 显示老师选择学生座位的表单 -->
+                            <!-- 顯示老師選擇學生座位的表單 -->
                             <label for="selected_student" class="form-label">選擇學生：</label>
                             <select class="form-select" name="selected_student" id="selected_student">
                                 {% for student in students %}

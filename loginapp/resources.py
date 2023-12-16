@@ -11,11 +11,11 @@ class StudentResource(resources.ModelResource):
         import_order = ('className', 'studentID', 'name','password', 'email', 'is_student', 'is_teacher')
 
     def before_save_instance(self, instance, using_transactions, dry_run):
-        # 检查密码是否已经被哈希化
+        # 檢查密碼是否已經被哈希化
         if not dry_run and 'password' in instance.changed_fields and not instance.password.startswith('bcrypt$'):
-            # 如果密码未被哈希化，使用 make_password 函数对其进行哈希化
+            # 如果密碼未被哈希化，使用 make_password 函數對其進行哈希化
             instance.password = make_password(instance.password)
-        # 调用 super 方法，执行原始的保存逻辑
+        # 調用 super 方法，執行原始的保存邏輯
         super().before_save_instance(instance, using_transactions, dry_run)
 
 

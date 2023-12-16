@@ -4,8 +4,8 @@ from .models import *
 from .resources import StudentResource
 # Register your models here.
 
-admin.site.site_header = '點名系統管理後台'  # 设置header
-admin.site.site_title = '點名系統管理後台'   # 设置title
+admin.site.site_header = '點名系統管理後台'  # 設置標頭
+admin.site.site_title = '點名系統管理後台'   # 設置標題
 admin.site.index_title = '點名系統管理後台'
 
 @admin.register(Student)

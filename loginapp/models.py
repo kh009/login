@@ -2,9 +2,6 @@ from django.db import models
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password
 
-# Create your models here.
-
-
 class Student(models.Model):
     className = models.CharField(max_length=20, verbose_name='班級名稱')
     studentID = models.CharField(max_length=10, primary_key=True, verbose_name='學號')
@@ -15,9 +12,9 @@ class Student(models.Model):
     is_teacher = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        # 在保存之前使用 make_password 将密码哈希化
+        # 在保存之前使用 make_password 將密碼哈希化
         if not self.password:
-            # 只有当密码为空时，才使用 studentID 作为默认密码
+            # 只有當密碼為空時，才使用 studentID 作為默認密碼
             self.password = make_password(self.studentID)
         else:
             self.password = make_password(self.password)
@@ -55,7 +52,7 @@ class Teacher(models.Model):
     is_teacher = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        # 在保存之前使用 make_password 将密码哈希化
+        # 在保存之前使用 make_password 將密碼進行哈希處理
         self.password = make_password(self.password)
         super().save(*args, **kwargs)
 
@@ -69,16 +66,16 @@ class Teacher(models.Model):
 
 class Course(models.Model):
     course_key = models.CharField(
-        max_length=20, primary_key=True, default="", verbose_name="課程代碼")  # 課程代碼
+        max_length=20, primary_key=True, default="", verbose_name="課程代碼")
     teacher_key = models.ForeignKey(
-        Teacher, on_delete=models.CASCADE, verbose_name="教師代碼")  # 教師代碼
-    course_name = models.CharField(max_length=20, verbose_name="課程名稱")  # 課程名稱
-    department = models.CharField(max_length=20, verbose_name="科系")  # 科系
-    course_grade = models.CharField(max_length=20, verbose_name="年級")  # 年級
-    course_className = models.CharField(max_length=20, verbose_name="班別")  # 班別
+        Teacher, on_delete=models.CASCADE, verbose_name="教師代碼")
+    course_name = models.CharField(max_length=20, verbose_name="課程名稱")
+    department = models.CharField(max_length=20, verbose_name="科系") 
+    course_grade = models.CharField(max_length=20, verbose_name="年級") 
+    course_className = models.CharField(max_length=20, verbose_name="班別") 
     classroom = models.ForeignKey(
-        Classroom, on_delete=models.CASCADE, verbose_name="教室代碼")  # 教室代碼
-    seat = models.IntegerField(default=0, verbose_name="座位")  # 座位
+        Classroom, on_delete=models.CASCADE, verbose_name="教室代碼")
+    seat = models.IntegerField(default=0, verbose_name="座位")
     DAY_CHOICES = [
         (1, '星期一'),
         (2, '星期二'),
@@ -89,7 +86,7 @@ class Course(models.Model):
         (7, '星期天'),
     ]
     day_of_week = models.IntegerField(choices=DAY_CHOICES, default=1)
-    class_time = models.TimeField(null=True, blank=True)  # 上課時間，默认为null，可以为空
+    class_time = models.TimeField(null=True, blank=True) 
 
     def __str__(self):
         return self.course_name
@@ -100,7 +97,7 @@ class Course(models.Model):
 
 
 class Course_seat(models.Model):
-    WEEK_CHOICES = [(i, f'{i}周') for i in range(1, 19)]  # 生成1到18周的选择项
+    WEEK_CHOICES = [(i, f'{i}周') for i in range(1, 19)]  # 生成1到18周的選擇項
     id = models.AutoField(primary_key=True, verbose_name='ID')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='學生')
     number = models.IntegerField(default=0, null=True, verbose_name='座位號')
@@ -110,17 +107,17 @@ class Course_seat(models.Model):
     week_number = models.IntegerField(choices=WEEK_CHOICES, default=1, verbose_name='周數')
     # 添加第一周的起始时间，这里假设第一周开始于2023年1月1日
 
-    FIRST_WEEK_START_TIME = datetime(2023, 1, 1)
+    # FIRST_WEEK_START_TIME = datetime(2023, 1, 1)
 
-    def get_week_start_time(self):
-        # 计算第一周的起始时间
-        first_week_start_time = self.FIRST_WEEK_START_TIME
+    # def get_week_start_time(self):
+    #     # 计算第一周的起始时间
+    #     first_week_start_time = self.FIRST_WEEK_START_TIME
 
-        # 计算当前周的起始时间
-        current_week_start_time = first_week_start_time + \
-            timedelta(weeks=self.week_number - 1)
+    #     # 计算当前周的起始时间
+    #     current_week_start_time = first_week_start_time + \
+    #         timedelta(weeks=self.week_number - 1)
 
-        return current_week_start_time
+    #     return current_week_start_time
 
     def __str__(self):
         return self.student.name

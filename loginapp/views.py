@@ -1,17 +1,15 @@
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.sessions.models import Session
-from .forms import AbsenceForm, ChangePasswordForm, WeekSelectForm
+from .forms import WeekSelectForm
 from django.shortcuts import get_object_or_404, render, redirect, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.urls import reverse
 from .models import *
-from .forms import StudentForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, time
 from django.contrib.auth.hashers import make_password, check_password
-
 
 
 # 標頭
@@ -37,7 +35,7 @@ def login(request):
         except Student.DoesNotExist:
             pass
 
-        # 再在 Teacher 模型中查找
+        # 再到 Teacher 模型中查找
         try:
             teacher = Teacher.objects.get(teacher_key=username)
             if check_password(password, teacher.password):
@@ -70,12 +68,12 @@ def change_password(request):
             messages.error(request, '現有密碼不正確')
             return redirect('change_password')
 
-        # 验证新密码和确认密码是否匹配
+        # 驗證新密碼和確認密碼是否匹配
         if new_password != confirm_password:
             messages.error(request, '新密碼和確認密碼不匹配')
             return redirect('change_password')
 
-        # 使用 make_password 函数生成哈希并保存到数据库
+        # 使用 make_password 函數生成哈希並保存到數據庫
         username2.password = new_password
         username2.save()
         print("password", username2.password)
@@ -120,14 +118,12 @@ def render_course_template(request, subject, seat_dict, course, course_seat, use
         "students": students,
     })
 
+
 # 計算星期
-
-
 def calculate_week_number(current_time):
-    # 添加第一周的起始时间
+    # 添加第一周的起始時間
     first_week_start_time = datetime(2023, 9, 10)
-
-    # 计算当前是第几周
+    # 計算目前是第幾周
     weeks_passed = (current_time - first_week_start_time).days // 7 + 1
 
     return weeks_passed
@@ -175,16 +171,15 @@ def course(request, subject):
         except Exception as e:
             print(e)
 
+        # 座位排列
         seat_dict = {}
         username_dict = {}
         for i in range(1, course.classroom.seat + 1):
             seat_dict[str(i)] = 0
-
         for i in course_seat:
             seat_dict[str(i.number)] = i.student
 
-        # 获取当前周数
-
+        # 獲取當前周數
         # 取得模型中的星期資訊
         week = course.day_of_week
         print("星期:", week)
@@ -276,13 +271,10 @@ def record(request, subject):
     username = request.session.get('username')
     position = request.session.get('position')
 
-    # 取得當前日期時間週數
     current_time = datetime.now()
     weeks_passed = calculate_week_number(current_time)
 
-    # form = WeekSelectForm(request.GET or None)
-    # selected_week = form['week_number'].value() if form.is_valid() else None
-    all_weeks = range(1, 19)  # 假設週數範圍為1到18
+    all_weeks = range(1, 19)  
     form = WeekSelectForm(request.GET or None)
     selected_week = form['week_number'].value() if form.is_valid(
     ) and form['week_number'].value() != '' else None
@@ -300,13 +292,11 @@ def record(request, subject):
             course_seats = Course_seat.objects.filter(
                 week_number=selected_week, course__course_name=subject)
         else:
-            # 學生或其他情況，顯示所有紀錄
             course_seats = Course_seat.objects.filter(
                 course__course_name=subject)
-
         print('course_seats', course_seats)
 
-    del_btn = False  # 默认情况下不显示删除按钮
+    del_btn = False  # 預設情況下不顯示刪除按鈕
     current_time_minus_10_minutes = current_time - timedelta(minutes=10)
     course_time = Course.objects.get(course_name=subject)
     class_datetime = datetime.combine(datetime.today(), course_time.class_time)
@@ -322,14 +312,14 @@ def record(request, subject):
             course=course_name,
             week_number=weeks_passed
         )
-        # 遍历选课学生，如果没有出勤记录则创建记录
+        # 遍歷選課學生，如果沒有出席記錄則創建記錄
         for student in selected_students:
-            # 检查该学生是否已经有出勤记录
+            # 檢查該學生是否已經有出席記錄
             existing_record = course_seats_week.filter(
                 student=student.studentID).first()
 
             if not existing_record:
-                # 创建出勤记录
+                # 創建出席記錄
                 Course_seat.objects.create(
                     student=student.studentID,
                     number=0,
@@ -340,7 +330,6 @@ def record(request, subject):
                 )
 
     if request.method == 'POST':
-        # 如果是 POST 请求，表示用户点击了删除按钮
         course_seat_id = request.POST.get('course_seat_id')
         try:
             course_seat = Course_seat.objects.get(id=course_seat_id)
@@ -369,8 +358,6 @@ def record(request, subject):
     })
 
 # 登出
-
-
 def logout(request):
     if 'username' in request.session:
         Session.objects.all().delete()
@@ -378,24 +365,3 @@ def logout(request):
 
     return redirect('/login/')
 
-
-def tt(request):
-    return render(request, "tt.html")
-
-
-def record_absence(request):
-    if request.method == 'POST':
-        form = AbsenceForm(request.POST)
-        if form.is_valid():
-            course_seat_id = form.cleaned_data['course_seat'].id
-            is_absent = form.cleaned_data['is_absent']
-
-            return redirect('record')
-
-    else:
-        # 获取所有学生的选课记录和所有课程
-        course_seats = Course_seat.objects.all()
-        courses = Course.objects.all()
-        form = AbsenceForm(initial={'course': courses.first()})
-
-    return render(request, 'teacher_record.html', {'form': form, 'course_seats': course_seats})
