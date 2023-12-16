@@ -131,6 +131,7 @@ class Course_seat(models.Model):
 
 
 class Course_Selection(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
     course_key = models.ForeignKey(
         Course, on_delete=models.CASCADE, verbose_name='課程代碼')
     studentID = models.ForeignKey(

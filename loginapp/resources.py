@@ -33,8 +33,9 @@ class TeacherResource(resources.ModelResource):
 class CourseResource(resources.ModelResource):
     class Meta:
         model = Course
-
+        import_id_fields = ['course_key']
 
 class Course_SelectionResource(resources.ModelResource):
     class Meta:
         model = Course_Selection
+        
