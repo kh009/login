@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, time
 from django.contrib.auth.hashers import make_password, check_password
+import ast
 
 
 # 標頭
@@ -203,9 +204,13 @@ def course(request, subject):
 
     if request.method == "POST":
         if position == 'teacher':
-            selected_student = request.POST.get('selected_student')
-            selected_student = Student.objects.get(studentID=selected_student)
-            print(selected_student)
+            selected_student = request.POST.get('selected_student')#包含元组的字符串
+            # 解析字符串为元组
+            selected_student_tuple = ast.literal_eval(selected_student)
+            # 获取学生ID
+            student_id = selected_student_tuple[0]
+            selected_student = get_object_or_404(Student, studentID=student_id)
+            # print(selected_student)
         try:
             number = request.POST['number']
         except:
